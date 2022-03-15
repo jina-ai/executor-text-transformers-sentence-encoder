@@ -2,4 +2,4 @@ manifest_version: 1
 name: TransformerSentenceEncoder
 description: Executor wraps the sentence_encoder library and computes sentence embeddings.
 url: https://github.com/jina-ai/executor-text-dpr-encoder
-keywords: [encoder, Numpy, sentence, nlp, huggingface]
+keywords: [encoder, Numpy, sentence, nlp, huggingface, 3.0-exclusive]
