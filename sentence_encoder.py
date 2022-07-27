@@ -7,6 +7,8 @@ import torch
 from jina import DocumentArray, Executor, requests
 from sentence_transformers import SentenceTransformer
 
+from warnings import warn
+
 
 class TransformerSentenceEncoder(Executor):
     """
@@ -16,7 +18,7 @@ class TransformerSentenceEncoder(Executor):
     def __init__(
         self,
         model_name: str = 'all-MiniLM-L6-v2',
-        traversal_paths: str = '@r',
+        access_paths: str = '@r',
         batch_size: int = 32,
         device: str = 'cpu',
         *args,
@@ -25,12 +27,14 @@ class TransformerSentenceEncoder(Executor):
         """
         :param model_name: The name of the sentence transformer to be used
         :param device: Torch device to put the model on (e.g. 'cpu', 'cuda', 'cuda:1')
-        :param traversal_paths: Default traversal paths
+        :param access_paths: Default access paths
         :param batch_size: Batch size to be used in the encoder model
         """
+        if("traversal_paths" in kwargs.keys()):
+            warn("'traversal_paths' is deprecated, please use 'access_paths'",DeprecationWarning,stacklevel=2)
         super().__init__(*args, **kwargs)
         self.batch_size = batch_size
-        self.traversal_paths = traversal_paths
+        self.access_paths = access_paths
         self.model = SentenceTransformer(model_name, device=device)
 
     @requests
@@ -46,7 +50,7 @@ class TransformerSentenceEncoder(Executor):
         document_batches_generator = DocumentArray(
             filter(
                 lambda d: d.text,
-                docs[parameters.get('traversal_paths', self.traversal_paths)],
+                docs[parameters.get('access_paths', self.access_paths)],
             )
         ).batch(batch_size=parameters.get('batch_size', self.batch_size))
 
