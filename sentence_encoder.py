@@ -1,7 +1,7 @@
 __copyright__ = "Copyright (c) 2020-2021 Jina AI Limited. All rights reserved."
 __license__ = "Apache-2.0"
 
-from typing import Dict
+from typing import Dict, Optional
 
 import torch
 from jina import DocumentArray, Executor, requests
@@ -19,6 +19,7 @@ class TransformerSentenceEncoder(Executor):
         self,
         model_name: str = 'all-MiniLM-L6-v2',
         access_paths: str = '@r',
+        traversal_paths: Optional[str] = None,
         batch_size: int = 32,
         device: str = 'cpu',
         *args,
@@ -27,14 +28,19 @@ class TransformerSentenceEncoder(Executor):
         """
         :param model_name: The name of the sentence transformer to be used
         :param device: Torch device to put the model on (e.g. 'cpu', 'cuda', 'cuda:1')
-        :param access_paths: Default access paths
+        :param access_paths: Default traversal paths
+        :param traversal_paths: please use access_paths
         :param batch_size: Batch size to be used in the encoder model
         """
-        if("traversal_paths" in kwargs.keys()):
-            warn("'traversal_paths' is deprecated, please use 'access_paths'",DeprecationWarning,stacklevel=2)
         super().__init__(*args, **kwargs)
         self.batch_size = batch_size
-        self.access_paths = access_paths
+        if traversal_paths is not None:
+            self.access_paths = traversal_paths
+            warn("'traversal_paths' will be deprecated in the future ,please use 'access_paths'.",
+                 DeprecationWarning,
+                 stacklevel=2)
+        else:
+            self.access_paths = access_paths
         self.model = SentenceTransformer(model_name, device=device)
 
     @requests
